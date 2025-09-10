@@ -1,0 +1,49 @@
+x-default:
+  &default-odoo
+  tty: true
+  build: .
+  restart: always
+  volumes:
+    - odoo-web-data:/var/lib/odoo
+    #- odoo-backups:/odoo/backups
+    - ./backups:/odoo/backups
+    - ./odoo.conf:/etc/odoo/odoo.conf
+    - ./vendor:/mnt/vendor
+
+services:
+  web:
+    << : *default-odoo
+    depends_on:
+      - db
+      - longpolling
+    ports:
+      - "{{ odoo_port }}:8069"
+
+  real-time:
+    << : *default-odoo
+    depends_on:
+      - db
+    command: ['odoo', 'gevent']
+    ports:
+      - "{{ realtime_port }}:8072"
+
+  db:
+    image: {% if odoo_version >= 12 %}postgres:16{% else %}postgres:12{% endif %}
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+    restart: always
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
+#  odoo-backups:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: /opt/work/git/my/odoo-docker-deployment/backups

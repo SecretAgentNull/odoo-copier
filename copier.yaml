@@ -1,0 +1,18 @@
+odoo_version:
+  type: int
+  help: Odoo version
+
+odoo_port:
+  type: int
+  help: Odoo port 
+  default: 8069
+
+realtime_port:
+  type: int
+  help: Real time communication port 
+  default: 8072
+
+odoo_domain:
+  type: str
+  help: Odoo domain
+  default: _

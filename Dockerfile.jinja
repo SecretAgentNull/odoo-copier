@@ -1,0 +1,12 @@
+{% set uid = "100:100" if odoo_version >= 18 else "101:101" -%}
+FROM odoo:{{ odoo_version }}
+
+USER root
+
+RUN chown -R {{ uid }} /odoo/backups
+
+# требуется для auto_backup
+RUN apt-get update && apt-get install -y build-essential libssl-dev libffi-dev python3-dev cargo
+RUN python3 -m pip install --upgrade pip && python3 -m pip install pysftp
+
+USER odoo
